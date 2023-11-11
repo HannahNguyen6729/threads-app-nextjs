@@ -17,7 +17,7 @@ import { userSchemaValidation } from '@/lib/validation/user';
 import { z } from 'zod';
 import { Textarea } from '../ui/textarea';
 import Image from 'next/image';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 
 interface Props {
   user: {
@@ -32,6 +32,8 @@ interface Props {
 }
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
+  const [imgFiles, setImgFiles] = useState<File[]>([]);
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof userSchemaValidation>>({
     resolver: zodResolver(userSchemaValidation),
@@ -55,7 +57,23 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     fieldChange: (value: string) => void
   ) => {
     e.preventDefault();
-    console.log({ e, fieldChange });
+
+    const fileReader = new FileReader();
+
+    if (e.target.files && e.target.files.length > 0) {
+      const uploadedImgFile = e.target.files[0];
+      if (!uploadedImgFile.type.includes('image')) return;
+      setImgFiles(Array.from(e.target.files));
+
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || '';
+
+        //update the image data field
+        fieldChange(imageDataUrl);
+      };
+
+      fileReader.readAsDataURL(uploadedImgFile);
+    }
   };
 
   return (
@@ -64,44 +82,41 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
         <FormField
           control={form.control}
           name="profile_photo"
-          render={({ field }) => {
-            console.log({ field });
-            return (
-              <FormItem className="flex gap-4 items-center">
-                <FormLabel className="account-form_image-label">
-                  {field.value ? (
-                    <Image
-                      src={field.value}
-                      alt="profile_icon"
-                      width={96}
-                      height={96}
-                      priority
-                      className="rounded-full object-contain"
-                    />
-                  ) : (
-                    <Image
-                      src="/assets/profile.svg"
-                      alt="profile_icon"
-                      width={24}
-                      height={24}
-                      className="object-contain"
-                    />
-                  )}
-                </FormLabel>
-
-                <FormControl className="flex-1 text-base-semibold text-gray-200">
-                  <Input
-                    onChange={(e) => handleImage(e, field.onChange)}
-                    type="file"
-                    accept="image/*"
-                    className="account-form_image-input"
-                    placeholder="Add profile photo"
+          render={({ field }) => (
+            <FormItem className="flex gap-4 items-center">
+              <FormLabel className="account-form_image-label">
+                {field.value ? (
+                  <Image
+                    src={field.value}
+                    alt="profile_icon"
+                    width={96}
+                    height={96}
+                    priority
+                    className="rounded-full object-contain"
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            );
-          }}
+                ) : (
+                  <Image
+                    src="/assets/profile.svg"
+                    alt="profile_icon"
+                    width={24}
+                    height={24}
+                    className="object-contain"
+                  />
+                )}
+              </FormLabel>
+
+              <FormControl className="flex-1 text-base-semibold text-gray-200">
+                <Input
+                  onChange={(e) => handleImage(e, field.onChange)}
+                  type="file"
+                  accept="image/*"
+                  className="account-form_image-input"
+                  placeholder="Add profile photo"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
 
         <FormField
