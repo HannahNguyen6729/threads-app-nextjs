@@ -18,6 +18,8 @@ import { z } from 'zod';
 import { Textarea } from '../ui/textarea';
 import Image from 'next/image';
 import { ChangeEvent, useState } from 'react';
+import { isBase64Image } from '@/lib/utils';
+import { useUploadThing } from '@/lib/uploadthing';
 
 interface Props {
   user: {
@@ -34,6 +36,8 @@ interface Props {
 const AccountProfile = ({ user, btnTitle }: Props) => {
   const [imgFiles, setImgFiles] = useState<File[]>([]);
 
+  const { startUpload } = useUploadThing('media');
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof userSchemaValidation>>({
     resolver: zodResolver(userSchemaValidation),
@@ -45,12 +49,6 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     },
   });
   console.log({ user });
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof userSchemaValidation>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log({ values });
-  }
 
   const handleImage = (
     e: ChangeEvent<HTMLInputElement>,
@@ -74,6 +72,24 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
 
       fileReader.readAsDataURL(uploadedImgFile);
     }
+  };
+
+  // 2. Define a submit handler.
+  const onSubmit = async (values: z.infer<typeof userSchemaValidation>) => {
+    const avatarUrl = values.profile_photo;
+
+    const hasImageChanged = isBase64Image(avatarUrl);
+    if (hasImageChanged) {
+      //upload image to uploadthing
+      const imgResponse = await startUpload(imgFiles);
+      if (imgResponse && imgResponse[0].url) {
+        //update avatar image url with useUploadThing hook
+        values.profile_photo = imgResponse[0].url;
+      }
+      console.log({ values, imgFiles, imgResponse });
+    }
+
+    // Todo: call backend function to update user profile
   };
 
   return (
