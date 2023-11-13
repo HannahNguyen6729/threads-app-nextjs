@@ -4,6 +4,7 @@ const MONGODB_URL = process.env.MONGODB_URL as string;
 
 export const connectDatabase = () => {
   mongoose.connect(MONGODB_URL);
+  mongoose.set('strictQuery', true);
 
   mongoose.connection.on('connected', () => {
     console.log('Mongoose default connection is open to MongoDB Atlas');

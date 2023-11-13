@@ -20,6 +20,9 @@ import Image from 'next/image';
 import { ChangeEvent, useState } from 'react';
 import { isBase64Image } from '@/lib/utils';
 import { useUploadThing } from '@/lib/uploadthing';
+import { updateUser } from '@/lib/actions/user.action';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   user: {
@@ -49,6 +52,9 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     },
   });
   console.log({ user });
+
+  const pathname = usePathname();
+  const router = useRouter();
 
   const handleImage = (
     e: ChangeEvent<HTMLInputElement>,
@@ -90,6 +96,20 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
     }
 
     // Todo: call backend function to update user profile
+    await updateUser({
+      userId: user.id,
+      username: values.username,
+      name: values.name,
+      bio: values.bio,
+      image: values.profile_photo,
+      path: pathname,
+    });
+
+    if (pathname === '/profile/edit') {
+      router.back();
+    } else {
+      router.push('/');
+    }
   };
 
   return (
