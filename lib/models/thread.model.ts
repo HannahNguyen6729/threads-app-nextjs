@@ -9,7 +9,7 @@ const ThreadSchema = new mongoose.Schema(
       required: true,
     },
     parentId: { type: String, default: null },
-    children: { type: mongoose.Schema.Types.ObjectId, ref: 'threads' },
+    children: [{ type: mongoose.Schema.Types.ObjectId, ref: 'threads' }],
     community: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'communities',
