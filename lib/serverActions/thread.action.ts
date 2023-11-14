@@ -31,7 +31,7 @@ export const createThread = async ({
     //update user model
     await UserModel.findByIdAndUpdate(author, {
       $push: { threads: newThread._id },
-    }).lean();
+    });
 
     revalidatePath(path);
 
@@ -61,8 +61,7 @@ export const getPosts = async (pageSize = 20, pageNumber = 1) => {
           path: 'author', // populate the author field in the children field
           select: '_id name image parentId',
         },
-      })
-      .lean();
+      });
 
     // count the number of posts/threads on top level those are not comments
     const totalPostsCount = await ThreadModel.countDocuments({
@@ -135,8 +134,10 @@ export const addCommentToThread = async ({
 
     // Save the updated original thread to the database
     await originalThread.save();
+
+    revalidatePath(path);
   } catch (error: any) {
     console.error('Error while adding the new comment to thread:', error);
-    throw new Error(`error: ${error.message}`);
+    throw new Error(`unable to add new comment: ${error.message}`);
   }
 };

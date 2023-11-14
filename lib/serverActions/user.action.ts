@@ -29,7 +29,7 @@ export const updateUser = async (user: UserProps): Promise<void> => {
         onboarded: true,
       },
       { upsert: true }
-    ).lean();
+    );
 
     if (user.path === '/profile/edit') revalidatePath(user.path);
   } catch (error: any) {
@@ -41,9 +41,8 @@ export const getUser = async (userId: string): Promise<any> => {
   try {
     connectDatabase();
 
-    const user = await UserModel.findOne({ id: userId })
-      //.populate({ path: 'communities' })
-      .lean();
+    const user = await UserModel.findOne({ id: userId });
+    //.populate({ path: 'communities' })
 
     return user;
   } catch (error: any) {
