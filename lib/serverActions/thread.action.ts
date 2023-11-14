@@ -73,6 +73,35 @@ export const getPosts = async (pageSize = 20, pageNumber = 1) => {
 
     return { posts, isNext };
   } catch (error: any) {
-    throw new Error(`failed to update user: ${error.message}`);
+    throw new Error(`failed to fetch threads: ${error.message}`);
+  }
+};
+
+export const getThreadById = async (threadId: string) => {
+  try {
+    connectDatabase();
+
+    const thread = await ThreadModel.findById(threadId)
+      .populate({ path: 'author', select: '_id id name image' })
+      //  .populate({ path: 'communities', select: 'i_id id name image' })
+      .populate({
+        path: 'children',
+        populate: [
+          { path: 'author', select: '_id id name image parentId' },
+          {
+            path: 'children', // Populate the children field within children
+            populate: {
+              path: 'author', // Populate the author field within nested children
+              select: '_id id name parentId image', // Select only _id and username fields of the author
+            },
+          },
+        ],
+      })
+      .lean();
+
+    return thread;
+  } catch (error: any) {
+    console.error('Error while fetching thread:', error);
+    throw new Error(`thread not found`);
   }
 };
