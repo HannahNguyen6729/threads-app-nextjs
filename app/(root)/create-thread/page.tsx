@@ -1,5 +1,5 @@
 import { PostThread } from '@/components/forms/PostThread';
-import { getUser } from '@/lib/actions/user.action';
+import { getUser } from '@/lib/serverActions/user.action';
 import { currentUser } from '@clerk/nextjs';
 
 export default async function Page() {

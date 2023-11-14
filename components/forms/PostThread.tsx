@@ -15,13 +15,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { ThreadSchemaValidation } from '@/lib/validation/thread';
 import { usePathname, useRouter } from 'next/navigation';
+import { createThread } from '@/lib/serverActions/thread.action';
 
 interface Props {
   userId: string;
 }
 
 export const PostThread = ({ userId }: Props) => {
-  console.log('user id in prost threads', userId);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -37,7 +37,12 @@ export const PostThread = ({ userId }: Props) => {
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof ThreadSchemaValidation>) => {
     // call async function to create a thread
-    //await createThread({text: values.thread, author: values.accountId, path:pathname, communityId: organization?? null })
+    await createThread({
+      text: values.thread,
+      author: userId,
+      path: pathname,
+      communityId: null,
+    });
 
     router.push('/');
   };
