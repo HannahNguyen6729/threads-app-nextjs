@@ -54,7 +54,7 @@ export const getPosts = async (pageSize = 20, pageNumber = 1) => {
       .skip(skipAmount)
       .limit(pageSize)
       .populate({ path: 'author' })
-      .populate({ path: 'community' })
+      // .populate({ path: 'community' })
       .populate({
         path: 'children', //populate the children field
         populate: {
