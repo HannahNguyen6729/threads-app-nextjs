@@ -26,6 +26,7 @@ export const updateUser = async (user: UserProps): Promise<void> => {
         bio: user.bio,
         image: user.image,
         path: user.path,
+        onboarded: true,
       },
       { upsert: true }
     ).lean();
@@ -33,5 +34,19 @@ export const updateUser = async (user: UserProps): Promise<void> => {
     if (user.path === '/profile/edit') revalidatePath(user.path);
   } catch (error: any) {
     throw new Error(`failed to update user: ${error.message}`);
+  }
+};
+
+export const getUser = async (userId: string): Promise<any> => {
+  try {
+    connectDatabase();
+
+    const user = await UserModel.findOne({ id: userId })
+      //.populate({ path: 'communities' })
+      .lean();
+
+    return user;
+  } catch (error: any) {
+    throw new Error(`failed to get user: ${error.message}`);
   }
 };
