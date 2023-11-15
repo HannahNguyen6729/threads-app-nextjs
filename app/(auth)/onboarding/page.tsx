@@ -1,13 +1,12 @@
 import AccountProfile from '@/components/forms/AccountProfile';
+import { getUser } from '@/lib/serverActions/user.action';
 import { currentUser } from '@clerk/nextjs';
 
 export default async function Page() {
   const user = await currentUser();
-  console.log({ user });
   if (!user) return null;
 
-  const userInfo: any = {};
-  //const userInfo = await getUserInDB(user.id)
+  const userInfo: any = await getUser(user.id);
 
   const userData = {
     id: user.id,
@@ -17,7 +16,7 @@ export default async function Page() {
     bio: userInfo ? userInfo?.bio : '',
     image: userInfo ? userInfo?.image : user.imageUrl,
   };
-
+  // console.log({ userData, user });
   return (
     <main className="mx-auto flex max-w-3xl flex-col justify-start px-10 py-20">
       <h1 className="head-text">Onboarding</h1>
