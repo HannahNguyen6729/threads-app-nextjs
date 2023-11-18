@@ -96,7 +96,7 @@ export const getUsers = async ({
     const regex = new RegExp(searchString, 'i');
 
     //create a query obj to filter users those match search criteria
-    const query: FilterQuery<typeof UserModel> = { id: { $nq: userId } }; //remove the current user from the user list
+    const query: FilterQuery<typeof UserModel> = { id: { $ne: userId } }; //remove the current user from the user list
 
     if (searchString.trim() !== '') {
       //if search string is not empty, add $or operator to match username/name
