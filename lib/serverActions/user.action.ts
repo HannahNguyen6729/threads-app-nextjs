@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache';
 import { UserModel } from '../models/user.model';
 import { connectDatabase } from '../mongoose';
 import { FilterQuery, SortOrder } from 'mongoose';
+import { ThreadModel } from '../models/thread.model';
+import { communityTabs } from '@/constants';
 
 interface UserProps {
   userId: string;
@@ -120,5 +122,31 @@ export const getUsers = async ({
     return { users, isNext };
   } catch (error: any) {
     throw new Error(`failed to get users: ${error.message}`);
+  }
+};
+
+export const getActivity = async (userId: string) => {
+  try {
+    connectDatabase();
+
+    //all posts created by the user
+    const userPosts = await ThreadModel.find({ author: userId });
+
+    //find all child post ids
+    const childPostIds = await userPosts.reduce((acc, post) => {
+      return acc.concat(post.children);
+    }, []);
+    console.log({ userPosts, childPostIds });
+    const replies = await ThreadModel.find({
+      _id: { $in: childPostIds },
+      author: { $ne: userId },
+    }).populate({
+      path: 'author',
+      select: '_id name image',
+    });
+
+    return replies;
+  } catch (error: any) {
+    throw new Error(`failed to get activities: ${error.message}`);
   }
 };
