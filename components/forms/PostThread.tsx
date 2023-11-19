@@ -16,6 +16,7 @@ import * as z from 'zod';
 import { ThreadSchemaValidation } from '@/lib/validation/thread';
 import { usePathname, useRouter } from 'next/navigation';
 import { createThread } from '@/lib/serverActions/thread.action';
+import { useOrganization } from '@clerk/nextjs';
 
 interface Props {
   userId: string;
@@ -24,6 +25,7 @@ interface Props {
 export const PostThread = ({ userId }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
+  const { organization } = useOrganization();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof ThreadSchemaValidation>>({
@@ -41,7 +43,7 @@ export const PostThread = ({ userId }: Props) => {
       text: values.thread,
       author: userId,
       path: pathname,
-      communityId: null,
+      communityId: organization ? organization.id : null,
     });
 
     router.push('/');
