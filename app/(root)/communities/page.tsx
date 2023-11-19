@@ -1,3 +1,4 @@
+import CommunityCard from '@/components/cards/CommunityCard';
 import Searchbar from '@/components/shared/Searchbar';
 import { fetchCommunities } from '@/lib/serverActions/community.actions';
 import { getUser } from '@/lib/serverActions/user.action';
@@ -28,7 +29,25 @@ export default async function ({
         <Searchbar routeType="communities" />
       </div>
 
-      <section className="mt-9 flex flex-wrap gap-4"></section>
+      <section className="mt-9 flex flex-wrap gap-4">
+        {result.communities.length === 0 ? (
+          <p className="no-result">No Result</p>
+        ) : (
+          <>
+            {result.communities.map((community) => (
+              <CommunityCard
+                key={community.id}
+                id={community.id}
+                name={community.name}
+                username={community.username}
+                imgUrl={community.image}
+                bio={community.bio}
+                members={community.members}
+              />
+            ))}
+          </>
+        )}
+      </section>
     </>
   );
 }

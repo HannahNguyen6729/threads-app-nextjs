@@ -109,7 +109,6 @@ const ThreadCard = ({
           </div>
         </div>
         {/*    TODO: Delete threads */}
-        {/*    TODO: show comment logos */}
       </div>
 
       {!isComment && comments.length > 0 && (
