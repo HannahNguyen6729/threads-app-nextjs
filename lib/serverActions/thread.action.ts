@@ -96,7 +96,7 @@ export const getThreadById = async (threadId: string) => {
 
     const thread = await ThreadModel.findById(threadId)
       .populate({ path: 'author', select: '_id id name image' })
-      .populate({ path: 'communities', select: 'i_id id name image' })
+      .populate({ path: 'community', select: '_id id name image' })
       .populate({
         path: 'children',
         populate: [
