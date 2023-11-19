@@ -6,7 +6,7 @@ export default function RightSidebar() {
           Suggested communities
         </h3>
         <div className="mt-7 flex w-[350px] flex-col gap-9">
-          <p className="text-light-1"> name of suggested community</p>
+          {/*  <p className="text-light-1"> name of suggested community</p> */}
         </div>
       </div>
     </section>

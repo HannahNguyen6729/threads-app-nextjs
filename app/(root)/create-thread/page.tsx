@@ -11,9 +11,9 @@ export default async function Page() {
   if (!userInfo?.onboarded) redirect('/onboarding');
 
   return (
-    <main>
+    <>
       <h1 className="text-head  text-light-1"> Create A New Thread</h1>
       <PostThread userId={userInfo._id} />
-    </main>
+    </>
   );
 }

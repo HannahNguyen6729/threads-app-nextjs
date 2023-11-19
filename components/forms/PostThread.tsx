@@ -59,9 +59,9 @@ export const PostThread = ({ userId }: Props) => {
           control={form.control}
           name="thread"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex w-full flex-col gap-3">
               <FormLabel className="text-light-2">Thread Content</FormLabel>
-              <FormControl>
+              <FormControl className="no-focus border border-dark-4 bg-dark-3 text-light-1">
                 <Textarea
                   {...field}
                   rows={16}
