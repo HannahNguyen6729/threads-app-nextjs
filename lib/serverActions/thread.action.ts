@@ -3,6 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { ThreadModel } from '../models/thread.model';
 import { UserModel } from '../models/user.model';
 import { connectDatabase } from '../mongoose';
+import { CommunityModel } from '../models/community.model';
 
 interface Props {
   text: string;
@@ -20,11 +21,16 @@ export const createThread = async ({
   try {
     connectDatabase();
 
+    const communityIdObject = await CommunityModel.findOne(
+      { id: communityId },
+      { _id: 1 }
+    );
+
     //create a new thread
     const newThread = await new ThreadModel({
       text,
       author,
-      community: null,
+      community: communityIdObject,
     });
     await newThread.save();
 
@@ -32,6 +38,14 @@ export const createThread = async ({
     await UserModel.findByIdAndUpdate(author, {
       $push: { threads: newThread._id },
     });
+
+    if (communityIdObject) {
+      // Update Community model
+      await CommunityModel.findByIdAndUpdate(communityIdObject, {
+        $push: { threads: newThread._id },
+      });
+    }
+    console.log({ communityIdObject });
 
     revalidatePath(path);
 
@@ -54,7 +68,7 @@ export const getPosts = async (pageSize = 20, pageNumber = 1) => {
       .skip(skipAmount)
       .limit(pageSize)
       .populate({ path: 'author' })
-      // .populate({ path: 'community' })
+      .populate({ path: 'community' })
       .populate({
         path: 'children', //populate the children field
         populate: {
@@ -82,7 +96,7 @@ export const getThreadById = async (threadId: string) => {
 
     const thread = await ThreadModel.findById(threadId)
       .populate({ path: 'author', select: '_id id name image' })
-      //  .populate({ path: 'communities', select: 'i_id id name image' })
+      .populate({ path: 'communities', select: 'i_id id name image' })
       .populate({
         path: 'children',
         populate: [
